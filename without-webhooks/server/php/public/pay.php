@@ -9,7 +9,7 @@ function calculateOrderAmount($items) {
 	return 1400;
 }
 
-function generateResponse($intent) 
+function generateResponse($intent)
 {
   switch($intent->status) {
     case "requires_action":
@@ -34,6 +34,7 @@ function generateResponse($intent)
 }
 
 try {
+
   if(isset($body->paymentMethodId)) {
     // Create new PaymentIntent with a PaymentMethod ID from the client.
 	if(isset($body->useStripeSdk)){
@@ -62,7 +63,7 @@ try {
     $intent = \Stripe\PaymentIntent::retrieve($body->paymentIntentId);
     $intent->confirm();
     // After confirm, if the PaymentIntent's status is succeeded, fulfill the order.
-  }  
+  }
   $output = generateResponse($intent);
 
   echo json_encode($output);
@@ -71,4 +72,3 @@ try {
     'error' => $e->getMessage()
   ]);
 }
-
