@@ -34,19 +34,27 @@ function generateResponse($intent)
 }
 
 try {
-  if($body->paymentMethodId != null) {
+  if(isset($body->paymentMethodId)) {
     // Create new PaymentIntent with a PaymentMethod ID from the client.
-    $intent = \Stripe\PaymentIntent::create([
-      "amount" => calculateOrderAmount($body->items),
-      "currency" => $body->currency,
-      "payment_method" => $body->paymentMethodId,
-      "confirmation_method" => "manual",
-      "confirm" => true,
-      // If a mobile client passes `useStripeSdk`, set `use_stripe_sdk=true`
-      // to take advantage of new authentication features in mobile SDKs
-      "use_stripe_sdk" => $body->useStripeSdk,
+	if(isset($body->useStripeSdk)){
+		$intent = \Stripe\PaymentIntent::create([
+	      "amount" => calculateOrderAmount($body->items),
+	      "currency" => $body->currency,
+	      "payment_method" => $body->paymentMethodId,
+	      "confirmation_method" => "manual",
+	      "confirm" => true,
+	      "use_stripe_sdk" => $body->useStripeSdk,
+	    ]);
+	} else {
+		$intent = \Stripe\PaymentIntent::create([
+	      "amount" => calculateOrderAmount($body->items),
+	      "currency" => $body->currency,
+	      "payment_method" => $body->paymentMethodId,
+	      "confirmation_method" => "manual",
+	      "confirm" => true,
+	    ]);
+	}
 
-    ]);
     // After create, if the PaymentIntent's status is succeeded, fulfill the order.
     } else if ($body->paymentIntentId != null) {
     // Confirm the PaymentIntent to finalize payment after handling a required action
